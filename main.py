@@ -48,5 +48,5 @@ class RPGApp(App):
         return MyScreenManager()
 
 # Execute o aplicativo
-if _name_ == '_main_':
+if __name__ == '_main_':
     RPGApp().run()
