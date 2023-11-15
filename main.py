@@ -1,52 +1,130 @@
-from kivy.app import App
-from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.uix.screenmanager import ScreenManager, Screen
+import pygame
+import sys
+import math
+import random
 
-class MainMenuScreen(Screen):
-    def _init_(self, **kwargs):
-        super(MainMenuScreen, self)._init_(**kwargs)
-        start_button = Button(text='Start Game', on_press=self.switch_to_game)
-        self.add_widget(start_button)
+# Inicialização do Pygame
+pygame.init()
 
-    def switch_to_game(self, instance):
-        self.manager.current = 'game'
+# Definição de cores
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+BLACK = (0, 0, 0)
 
-class GameScreen(Screen):
-    def _init_(self, **kwargs):
-        super(GameScreen, self)._init_(**kwargs)
-        
-        # Exemplo de botões para andar, bater e escolher
-        move_button = Button(text='Move', on_press=self.move_character)
-        attack_button = Button(text='Attack', on_press=self.attack_enemy)
-        choose_button = Button(text='Make a Choice', on_press=self.make_choice)
+# Configurações da tela
+WIDTH, HEIGHT = 1600, 1200  # Ajuste para um ambiente maior
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Jogo RPG Pygame")
 
-        # Adicione os botões à interface do usuário
-        self.add_widget(move_button)
-        self.add_widget(attack_button)
-        self.add_widget(choose_button)
+# Classe Personagem
+class Personagem(pygame.sprite.Sprite):
+    def _init_(self, nome, cor, x, y):
+        super()._init_()
+        self.image = pygame.Surface((50, 50))
+        self.image.fill(cor)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.nome = nome
+        self.pontos_vida = 100
+        self.vivo = True  # Adiciona um atributo para verificar se o personagem está vivo
 
-    def move_character(self, instance):
-        # Lógica para mover o personagem
-        print("Personagem se moveu.")
+    def atacar(self, alvo):
+        alvo.receber_dano(10)  # Simples exemplo de dano fixo
 
-    def attack_enemy(self, instance):
-        # Lógica para atacar o inimigo
-        print("Personagem atacou o inimigo.")
+    def receber_dano(self, dano):
+        self.pontos_vida -= dano
+        if self.pontos_vida <= 0:
+            print(f"{self.nome} foi derrotado!")
+            self.vivo = False  # Define o personagem como derrotado
+            self.kill()  # Remove o personagem do grupo de sprites
 
-    def make_choice(self, instance):
-        # Lógica para fazer uma escolha
-        print("Jogador fez uma escolha.")
+    def update(self, keys, all_sprites):
+        # Atualiza a posição do personagem com base nas teclas pressionadas
+        if keys[pygame.K_LEFT]:
+            self.rect.x -= 5
+        if keys[pygame.K_RIGHT]:
+            self.rect.x += 5
+        if keys[pygame.K_UP]:
+            self.rect.y -= 5
+        if keys[pygame.K_DOWN]:
+            self.rect.y += 5
 
-# Gerenciador de telas
-class MyScreenManager(ScreenManager):
-    pass
+        # Mantém o personagem dentro das bordas da tela
+        self.rect.x = max(0, min(self.rect.x, WIDTH - 50))
+        self.rect.y = max(0, min(self.rect.y, HEIGHT - 50))
 
-class RPGApp(App):
-    def build(self):
-        # Crie e retorne o gerenciador de tela
-        return MyScreenManager()
+        # Verifica a proximidade com outros sprites
+        for sprite in all_sprites:
+            if isinstance(sprite, Personagem) and sprite != self and sprite.vivo and self.vivo:
+                distancia = math.sqrt((self.rect.x - sprite.rect.x)*2 + (self.rect.y - sprite.rect.y)*2)
+                if distancia < 50 and keys[pygame.K_SPACE]:  # Ajuste esse valor conforme necessário para a sua proximidade desejada
+                    self.atacar(sprite)
 
-# Execute o aplicativo
-if __name__ == '_main_':
-    RPGApp().run()
+# Inicialização do jogador
+jogador = Personagem("Jogador", RED, WIDTH // 2, HEIGHT // 2)
+
+# Grupo de sprites
+all_sprites = pygame.sprite.Group()
+all_sprites.add(jogador)
+
+# Adiciona alguns NPCs
+num_npcs = 5
+for _ in range(num_npcs):
+    cor_npc = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+    npc = Personagem("NPC", cor_npc, random.randint(0, WIDTH - 50), random.randint(0, HEIGHT - 50))
+    npc.velocidade_x = random.randint(-3, 3)  # Adiciona velocidade aleatória no eixo X
+    npc.velocidade_y = random.randint(-3, 3)  # Adiciona velocidade aleatória no eixo Y
+    all_sprites.add(npc)
+
+# Loop do jogo
+clock = pygame.time.Clock()
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    # Captura as teclas pressionadas
+    keys = pygame.key.get_pressed()
+
+    # Lógica do jogo
+    jogador.update(keys, all_sprites)
+
+    # Atualização da tela
+    screen.fill(WHITE)
+
+    # Movimenta NPCs e mantém dentro das bordas
+    for sprite in all_sprites:
+        if isinstance(sprite, Personagem) and sprite != jogador and sprite.vivo:
+            # Salva as posições anteriores do NPC
+            old_x, old_y = sprite.rect.x, sprite.rect.y
+
+            # Atualiza as posições do NPC
+            sprite.rect.x += sprite.velocidade_x
+            sprite.rect.y += sprite.velocidade_y
+
+            # Verifica se o NPC ultrapassa as bordas da tela
+            if not (0 <= sprite.rect.x < WIDTH - 50 and 0 <= sprite.rect.y < HEIGHT - 50):
+                # Se ultrapassar, reverte para as posições anteriores
+                sprite.rect.x, sprite.rect.y = old_x, old_y
+
+    # Desenha os sprites na tela
+    all_sprites.draw(screen)
+
+    # Adiciona informações de saúde na tela
+    font = pygame.font.Font(None, 36)
+    texto_jogador = font.render(f"Jogador: {jogador.pontos_vida} HP", True, BLACK)
+    
+    for sprite in all_sprites:
+        if isinstance(sprite, Personagem) and sprite.nome == "NPC" and sprite.vivo:
+            texto_npc = font.render(f"NPC: {sprite.pontos_vida} HP", True, BLACK)
+            screen.blit(texto_npc, (sprite.rect.x, sprite.rect.y - 30))  # Exibe a vida acima do NPC
+
+    screen.blit(texto_jogador, (10, 10))
+
+    pygame.display.flip()
+
+    # Controle de frames por segundo
+    clock.tick(30)
