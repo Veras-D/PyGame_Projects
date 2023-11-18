@@ -58,7 +58,7 @@ class Personagem(pygame.sprite.Sprite):
         for sprite in all_sprites:
             if isinstance(sprite, Personagem) and sprite != self and sprite.vivo and self.vivo:
                 distancia = math.sqrt(abs((self.rect.x - sprite.rect.x)*2 + (self.rect.y - sprite.rect.y)*2))
-                if distancia < 50 and keys[pygame.K_SPACE]:  # Ajuste esse valor conforme necessário para a sua proximidade desejada
+                if distancia < 10 and keys[pygame.K_SPACE]:  # Ajuste esse valor conforme necessário para a sua proximidade desejada
                     self.atacar(sprite)
 
 # Inicialização do jogador
