@@ -1,2 +1,2 @@
 # RPG-Python
-Jogo RPG escrito em python com a biblioteca kivy
+Jogo JRPG escrito em python com a biblioteca pygame
