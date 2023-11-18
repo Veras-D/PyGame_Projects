@@ -18,8 +18,8 @@ pygame.display.set_caption("Jogo RPG Pygame")
 
 # Classe Personagem
 class Personagem(pygame.sprite.Sprite):
-    def _init_(self, nome, cor, x, y):
-        super()._init_()
+    def __init__(self, nome, cor, x, y):
+        super().__init__()
         self.image = pygame.Surface((50, 50))
         self.image.fill(cor)
         self.rect = self.image.get_rect()
@@ -57,7 +57,7 @@ class Personagem(pygame.sprite.Sprite):
         # Verifica a proximidade com outros sprites
         for sprite in all_sprites:
             if isinstance(sprite, Personagem) and sprite != self and sprite.vivo and self.vivo:
-                distancia = math.sqrt((self.rect.x - sprite.rect.x)*2 + (self.rect.y - sprite.rect.y)*2)
+                distancia = math.sqrt(abs((self.rect.x - sprite.rect.x)*2 + (self.rect.y - sprite.rect.y)*2))
                 if distancia < 50 and keys[pygame.K_SPACE]:  # Ajuste esse valor conforme necessário para a sua proximidade desejada
                     self.atacar(sprite)
 
