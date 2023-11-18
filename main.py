@@ -2,9 +2,13 @@ import pygame
 import sys
 import math
 import random
+import play_music
 
 # Inicialização do Pygame
 pygame.init()
+
+# Musica
+play_music.play_main_music()
 
 # Definição de cores
 WHITE = (255, 255, 255)
