@@ -22,9 +22,6 @@ WIDTH, HEIGHT = info.current_w * 0.9, info.current_h * 0.9
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 pygame.display.set_caption("Jogo RPG Pygame")
 
-#pygame.display.toggle_fullscreen()
-#pygame.display.iconify()
-
 # Classe Personagem
 class Personagem(pygame.sprite.Sprite):
     def __init__(self, nome, cor, x, y):
@@ -78,7 +75,7 @@ all_sprites = pygame.sprite.Group()
 all_sprites.add(jogador)
 
 # Adiciona alguns NPCs
-num_npcs = 5
+num_npcs = 10
 for _ in range(num_npcs):
     cor_npc = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
     npc = Personagem("NPC", cor_npc, random.randint(0, WIDTH - 50), random.randint(0, HEIGHT - 50))
@@ -94,6 +91,9 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+
+        if event.type == pygame.USEREVENT:
+            play_music.play_main_music()
 
     # Captura as teclas pressionadas
     keys = pygame.key.get_pressed()
@@ -130,6 +130,7 @@ while True:
         if isinstance(sprite, Personagem) and sprite.nome == "NPC" and sprite.vivo:
             texto_npc = font.render(f"NPC: {sprite.pontos_vida} HP", True, BLACK)
             screen.blit(texto_npc, (sprite.rect.x, sprite.rect.y - 30))  # Exibe a vida acima do NPC
+    # Se a música terminar, reproduza a música novamente
 
     screen.blit(texto_jogador, (10, 10))
 
