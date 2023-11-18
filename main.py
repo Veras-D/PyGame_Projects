@@ -16,9 +16,14 @@ RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 
 # Configurações da tela
-WIDTH, HEIGHT = 1600, 1200  # Ajuste para um ambiente maior
+
+info = pygame.display.Info()
+WIDTH, HEIGHT = info.current_w * 0.9, info.current_h * 0.9  # Ajuste para um ambiente maior
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Jogo RPG Pygame")
+
+#pygame.display.toggle_fullscreen()
+#pygame.display.iconify()
 
 # Classe Personagem
 class Personagem(pygame.sprite.Sprite):
