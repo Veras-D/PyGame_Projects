@@ -18,7 +18,7 @@ BLACK = (0, 0, 0)
 # Configurações da tela
 
 info = pygame.display.Info()
-WIDTH, HEIGHT = info.current_w * 0.9, info.current_h * 0.9
+WIDTH, HEIGHT = int(info.current_w * 0.5), int(info.current_h * 0.5)
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 pygame.display.set_caption("Jogo RPG Pygame")
 
@@ -67,8 +67,9 @@ class Personagem(pygame.sprite.Sprite):
                 if distancia < 10 and keys[pygame.K_SPACE]:  # Ajuste esse valor conforme necessário para a sua proximidade desejada
                     self.atacar(sprite)
 
-# Inicialização do jogador
-jogador = Personagem("Jogador", RED, WIDTH // 2, HEIGHT // 2)
+
+# Inicialização do jogador, posição inicial do jogador
+jogador = Personagem("Jogador", RED, (WIDTH / 2), (HEIGHT / 2))
 
 # Grupo de sprites
 all_sprites = pygame.sprite.Group()
