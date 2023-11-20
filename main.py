@@ -47,13 +47,13 @@ class Personagem(pygame.sprite.Sprite):
 
     def update(self, keys, all_sprites):
         # Atualiza a posição do personagem com base nas teclas pressionadas
-        if keys[pygame.K_LEFT]:
+        if keys[pygame.K_a]:
             self.rect.x -= 5
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_d]:
             self.rect.x += 5
-        if keys[pygame.K_UP]:
+        if keys[pygame.K_w]:
             self.rect.y -= 5
-        if keys[pygame.K_DOWN]:
+        if keys[pygame.K_s]:
             self.rect.y += 5
 
         # Mantém o personagem dentro das bordas da tela
@@ -64,8 +64,9 @@ class Personagem(pygame.sprite.Sprite):
         for sprite in all_sprites:
             if isinstance(sprite, Personagem) and sprite != self and sprite.vivo and self.vivo:
                 distancia = math.sqrt(abs((self.rect.x - sprite.rect.x)*2 + (self.rect.y - sprite.rect.y)*2))
-                if distancia < 10 and keys[pygame.K_SPACE]:  # Ajuste esse valor conforme necessário para a sua proximidade desejada
-                    self.atacar(sprite)
+                if keys[pygame.K_SPACE]:
+                    if distancia < 10:  # Ajuste esse valor conforme necessário para a sua proximidade desejada
+                        self.atacar(sprite)
 
 
 # Inicialização do jogador, posição inicial do jogador
@@ -131,11 +132,10 @@ while True:
         if isinstance(sprite, Personagem) and sprite.nome == "NPC" and sprite.vivo:
             texto_npc = font.render(f"NPC: {sprite.pontos_vida} HP", True, BLACK)
             screen.blit(texto_npc, (sprite.rect.x, sprite.rect.y - 30))  # Exibe a vida acima do NPC
-    # Se a música terminar, reproduza a música novamente
 
     screen.blit(texto_jogador, (10, 10))
 
     pygame.display.flip()
 
-    # Controle de frames por segundo
+    # Controle de fps
     clock.tick(30)
