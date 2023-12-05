@@ -16,7 +16,7 @@ x= 50
 y= 50 
 width = 50
 height = 50
-speed = 1000
+speed = 2000
 
 
 game = Game(screen)
